@@ -13,7 +13,8 @@ sqlalchemy>=2.0.0
 
 # Authentication & Security
 passlib>=1.7.4
-bcrypt>=4.0.0
+bcrypt==4.1.2
+cffi>=1.15.0
 
 # API & External Services
 requests>=2.31.0
