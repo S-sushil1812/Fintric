@@ -1,0 +1,26 @@
+# pip install -r requirements.txt
+# Core dependencies for AI Finance Tracker application
+
+# Web Framework
+streamlit>=1.28.0
+streamlit-elements>=0.1.0
+
+# Data Processing
+pandas>=2.0.0
+
+# Database
+sqlalchemy>=2.0.0
+
+# Authentication & Security
+passlib>=1.7.4
+bcrypt>=4.0.0
+
+# API & External Services
+requests>=2.31.0
+google-generativeai>=0.3.0
+
+# Visualization
+plotly>=5.0.0
+
+# Environment Configuration
+python-dotenv>=1.0.0
