@@ -1160,13 +1160,20 @@ def show_transaction_page(user_id):
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Add Button
+    # Add Button with Session State for Success Message
+    if 'transaction_added' not in st.session_state:
+        st.session_state.transaction_added = False
+    
     if st.button('➕ Add Transaction', key='add_txn', use_container_width=True):
         signed = amt if ttype == 'Credit' else -amt
         desc_value = (desc or cat or 'Manual entry').strip()
         txmod.add_transaction(user_id, dt.isoformat(), desc_value, signed, category=cat, notes=(notes or None))
+        st.session_state.transaction_added = True
+    
+    # Display success message if transaction was just added
+    if st.session_state.transaction_added:
         st.success('✅ Transaction added successfully!')
-        st.rerun()
+        st.session_state.transaction_added = False
     
     # Summary Cards
     rows_user = txmod.list_transactions(user_id)
