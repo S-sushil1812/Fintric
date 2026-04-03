@@ -1229,22 +1229,54 @@ def show_transaction_page(user_id):
         st.markdown('<div class="section-title" style="margin-top: 0;">🗑️ Delete Transactions</div>', unsafe_allow_html=True)
         
         if rows_user:
+            # Initialize session state for delete confirmations
+            if 'delete_confirm_single' not in st.session_state:
+                st.session_state.delete_confirm_single = False
+            if 'delete_confirm_all' not in st.session_state:
+                st.session_state.delete_confirm_all = False
+            
             idx = st.selectbox('Select a transaction to delete', options=list(range(len(rows_user))), format_func=lambda i: f"{rows_user[i].date} | {rows_user[i].description} | ${abs(rows_user[i].amount):,.2f}", label_visibility='collapsed', key='delete_select')
             
             del_col1, del_col2 = st.columns(2)
+            
+            # Delete Single Transaction
             with del_col1:
-                if st.button('🗑️ Delete Selected', key='del_one', use_container_width=True):
-                    if st.checkbox('Confirm deletion', key='conf_del'):
-                        txmod.delete_transaction(rows_user[idx].id)
-                        st.success('✅ Transaction deleted!')
-                        st.rerun()
+                st.markdown('<p style="margin: 0; margin-bottom: 5px;"><small><b>Delete Selected</b></small></p>', unsafe_allow_html=True)
+                if st.button('🗑️ Delete', key='del_one', use_container_width=True):
+                    st.session_state.delete_confirm_single = True
+                
+                if st.session_state.delete_confirm_single:
+                    confirm = st.checkbox('✅ I confirm to delete this transaction', key='conf_del_single', value=False)
+                    if confirm:
+                        try:
+                            txmod.delete_transaction(rows_user[idx].id)
+                            st.session_state.delete_confirm_single = False
+                            st.success('✅ Transaction deleted successfully!')
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f'❌ Error deleting transaction: {str(e)}')
+                    else:
+                        st.warning('⚠️ Check the box above to confirm deletion')
+            
+            # Delete All Transactions
             with del_col2:
-                if st.button('🗑️ Delete ALL Transactions', key='del_all', use_container_width=True):
-                    if st.checkbox('Confirm delete ALL', key='conf_del_all'):
-                        for r in rows_user:
-                            txmod.delete_transaction(r.id)
-                        st.success('✅ All transactions deleted!')
-                        st.rerun()
+                st.markdown('<p style="margin: 0; margin-bottom: 5px;"><small><b>Delete All</b></small></p>', unsafe_allow_html=True)
+                if st.button('🗑️ Delete ALL', key='del_all', use_container_width=True):
+                    st.session_state.delete_confirm_all = True
+                
+                if st.session_state.delete_confirm_all:
+                    confirm = st.checkbox('✅ I confirm to delete ALL transactions (Cannot undo!)', key='conf_del_all', value=False)
+                    if confirm:
+                        try:
+                            for r in rows_user:
+                                txmod.delete_transaction(r.id)
+                            st.session_state.delete_confirm_all = False
+                            st.success('✅ All transactions deleted successfully!')
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f'❌ Error deleting transactions: {str(e)}')
+                    else:
+                        st.warning('⚠️ Check the box above to confirm deletion')
         
         st.markdown('</div>', unsafe_allow_html=True)
     else:
